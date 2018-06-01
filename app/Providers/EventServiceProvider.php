@@ -17,7 +17,7 @@ class EventServiceProvider extends ServiceProvider
             'CodeShopping\Listeners\EventListener',
         ],
     ];
-
+  
     /**
      * Register any events for your application.
      *
