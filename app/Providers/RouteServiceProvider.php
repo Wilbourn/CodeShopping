@@ -1,7 +1,11 @@
 <?php
 
 namespace CodeShopping\Providers;
+
+use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 use CodeShopping\Models\Category;
+use CodeShopping\Models\Product;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
@@ -31,8 +35,22 @@ class RouteServiceProvider extends ServiceProvider
             $collection = Category::whereId($value)->orWhere('slug',$value)->get();
             return $collection->first();
         });
+
+        Route::bind('product',function($value){
+            $query = Product::query();
+            $query = $this->onlyTrashedIfRequested($query);
+            $collection = $query->whereId($value)->orWhere('slug',$value)->get();
+            return $collection->first();
+        });
+
     }
 
+    private function onlyTrashedIfRequested(Builder $query){
+        if(\Request::get('trashed')== 1){
+            $query = $query->onlyTrashed();
+        }
+        return $query;
+    }
     /**
      * Define the routes for the application.
      *
