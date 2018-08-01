@@ -1,6 +1,9 @@
 <?php
 
 namespace CodeShopping\Http\Controllers\Api;
+
+use CodeShopping\Events\UserCreateEvent;
+use CodeShopping\Common\OnlyTrashed;
 use CodeShopping\Models\User;
 use CodeShopping\Http\Resources\UserResource;
 use CodeShopping\Http\Requests\UserRequest;
@@ -9,8 +12,13 @@ use CodeShopping\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
-    public function index(){
-        $users = User::paginate();
+
+    use OnlyTrashed;
+
+    public function index(Request $request){
+        $query = User::query();
+        $query = $this->onlyTrashedIfRequested($request,$query);
+        $users = $query->paginate(10);
         return UserResource::collection($users);
     }
 
@@ -20,6 +28,7 @@ class UserController extends Controller
 
     public function store(UserRequest $request){
         $user = User::create($request->all());
+        event(new UserCreateEvent($user));
         return new UserResource($user);
     }
 

@@ -1,6 +1,8 @@
 <?php
 
 namespace CodeShopping\Http\Controllers\Api;
+
+use CodeShopping\Common\OnlyTrashed;
 use CodeShopping\Http\Resources\ProductResource;
 use CodeShopping\Http\Requests\ProductRequest;
 use CodeShopping\Http\Controllers\Controller;
@@ -10,7 +12,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ProductController extends Controller
 {
-    
+    use OnlyTrashed;
+
     public function index(Request $request)
     {
         $query = Product::query();
@@ -43,13 +46,6 @@ class ProductController extends Controller
     {
         $product->delete();
         return response()->json([],204);
-    }
-   
-    private function onlyTrashedIfRequested(Request $request,Builder $query){
-        if($request->get('trashed')== 1){
-            $query = $query->onlyTrashed();
-        }
-        return $query;
     }
 
     public function restore(Product $product){
